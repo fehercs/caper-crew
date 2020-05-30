@@ -1,0 +1,12 @@
+public enum Skill {
+    DRIVING,
+    VEHICLE_SELECTION,
+    ACCURACY,
+    FIREARM_HANDLING,
+    REFLEX,
+    STRATEGY,
+    CHARISMA,
+    COMPUTER_SKILLS,
+    SPEED,
+    STEALTH
+}
