@@ -18,7 +18,9 @@ public enum Skill {
     private Skill(int value) {
         this.value = value;
     }
-
+    public int getValue() {
+        return this.value;
+    }
     public static Skill getRandomSkill() {
         return values()[GameMain.getRandomInteger(2, values().length - 1)];
     }

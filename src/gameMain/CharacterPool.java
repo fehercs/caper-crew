@@ -5,13 +5,17 @@ import crew.*;
 import java.util.Arrays;
 
 public class CharacterPool {
-    private static CrewMember[] pool = new CrewMember[10];
+    private  CrewMember[] pool = new CrewMember[10];
 
-    public static CrewMember[] getCharacterPool() {
-        return pool;
+    public CharacterPool() {
+        generatePool();
     }
 
-    public static void generatePool() {
+    public  CrewMember[] getCharacterPool() {
+        return this.pool;
+    }
+
+    private void generatePool() {
         for (int i = 0; i < pool.length; i++) {
             int r = GameMain.getRandomInteger(0, 100);
             if (r < 6) {
@@ -45,7 +49,7 @@ public class CharacterPool {
         }
     }
 
-    private static CrewMember getRandomCrew() {
+    private CrewMember getRandomCrew() {
         int r = GameMain.getRandomInteger(0, 100);
         if (r < 6) {
             //Partner in Crime
@@ -77,7 +81,7 @@ public class CharacterPool {
         }
     }
 
-    public static void refreshPool() {
+    public void refreshPool() {
         int[] indexes = new int[5];
         int counter = 0;
         while (counter < 5) {
@@ -93,7 +97,7 @@ public class CharacterPool {
         }
     }
 
-    public static void switchCharacter(int i, CrewMember crew) {
+    public void switchCharacter(int i, CrewMember crew) {
         if (i < 10 && i >= 0) {
             pool[i] = crew;
         }

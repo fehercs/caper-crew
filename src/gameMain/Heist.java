@@ -27,6 +27,14 @@ public class Heist {
         }
     }
 
+    public LinkedList<Test> getTests() {
+        return tests;
+    }
+
+    public int getReward() {
+        return reward;
+    }
+
     @Override
     public String toString() {
         return "Heist{" +
