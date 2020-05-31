@@ -1,3 +1,5 @@
+package gameMain;
+
 public class Player {
     private final int MONEY_GOAL;
     private int heistsLeft;
