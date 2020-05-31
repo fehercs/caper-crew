@@ -2,6 +2,8 @@ package gameMain;
 
 import crew.*;
 
+import java.util.Arrays;
+
 public class CharacterPool {
     private static CrewMember[] pool = new CrewMember[10];
 
@@ -40,6 +42,60 @@ public class CharacterPool {
                 //GunMan
                 pool[i] = new Gunman();
             }
+        }
+    }
+
+    private static CrewMember getRandomCrew() {
+        int r = GameMain.getRandomInteger(0, 100);
+        if (r < 6) {
+            //Partner in Crime
+            return new PartnerInCrime();
+        } else if (r < 12) {
+            //Hacker
+            return new Hacker();
+        } else if (r < 18) {
+            //Coordinator
+            return new Coordinator();
+        } else if (r < 30) {
+            //Distraction
+            return new Distraction();
+        } else if (r < 42) {
+            //Driver
+            return new Driver();
+        } else if (r < 53) {
+            //ConMan
+            return new ConMan();
+        } else if (r < 65) {
+            //Burglar
+            return new Burglar();
+        } else if (r < 77) {
+            //GadgetGuy
+            return new GadgetGuy();
+        } else {
+            //GunMan
+            return new Gunman();
+        }
+    }
+
+    public static void refreshPool() {
+        int[] indexes = new int[5];
+        int counter = 0;
+        while (counter < 5) {
+            int r = GameMain.getRandomInteger(0, 9);
+            if (!Arrays.stream(indexes).anyMatch(e -> e == r)) {
+                indexes[counter] = r;
+                counter++;
+            }
+        }
+        System.out.println(Arrays.toString(indexes));
+        for (int i : indexes) {
+            pool[i] = getRandomCrew();
+        }
+    }
+
+    public static void switchCharacter(int i, CrewMember crew) {
+        if (i < 10 && i >= 0) {
+            pool[i] = crew;
         }
     }
 }

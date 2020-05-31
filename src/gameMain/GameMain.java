@@ -8,14 +8,16 @@ import crew.*;
 import gui.*;
 
 public class GameMain {
+    private static final Random r = new Random();
+
     public static void main(String[] args) {
 //        JFrame frame = new CaperCrewGameGUI("Cape Crew");
 //        frame.setVisible(true);
-        CharacterPool.generatePool();
-        System.out.println(Arrays.toString(CharacterPool.getCharacterPool()));
+        System.out.println(new Heist().toString());
+
     }
 
     public static int getRandomInteger(int min, int max) {
-        return new Random().nextInt(max + 1 - min) + min;
+        return r.nextInt(max + 1 - min) + min;
     }
 }

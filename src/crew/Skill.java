@@ -1,5 +1,7 @@
 package crew;
 
+import gameMain.GameMain;
+
 public enum Skill {
     DRIVING(0),
     VEHICLE_SELECTION(1),
@@ -15,5 +17,9 @@ public enum Skill {
 
     private Skill(int value) {
         this.value = value;
+    }
+
+    public static Skill getRandomSkill() {
+        return values()[GameMain.getRandomInteger(2, values().length - 1)];
     }
 }
