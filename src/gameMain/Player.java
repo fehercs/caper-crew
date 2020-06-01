@@ -2,21 +2,22 @@ package gameMain;
 
 import crew.CrewMember;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Player {
     private final int MONEY_GOAL;
     private int heistsLeft;
     private int money;
-    private Set<CrewMember> currentCrew;
-    private Heist currentHeist;
+    private List<CrewMember> currentCrew;
+    private int currentCut;
 
     public Player(int MONEY_GOAL) {
         this.MONEY_GOAL = MONEY_GOAL;
         this.heistsLeft = 20;
         this.money = 0;
-        this.currentCrew = new HashSet<CrewMember>();
+        this.currentCrew = new ArrayList<>();
+        this.currentCut = 100;
     }
 
     public int getMONEY_GOAL() {
@@ -31,27 +32,35 @@ public class Player {
         return money;
     }
 
-    public Set<CrewMember> getCurrentCrew() {
+    public List<CrewMember> getCurrentCrew() {
         return currentCrew;
     }
 
-    public Heist getCurrentHeist() {
-        return currentHeist;
+    public int getCurrentCut() {
+        return currentCut;
+    }
+
+    public void setCurrentCut(int currentCut) {
+        this.currentCut = currentCut;
     }
 
     public void reduceHeistsByOne() {
         this.heistsLeft--;
     }
 
-    public void addCurrentCrew(Set<CrewMember> selectedCrew) {
-        this.currentCrew = selectedCrew;
+    public void addCrewMember(CrewMember crew) {
+        this.currentCrew.add(crew);
     }
 
-    public void addHeist(Heist selectedHeist) {
-        this.currentHeist = selectedHeist;
+    public void addCurrentCrew(List<CrewMember> selectedCrew) {
+        this.currentCrew = selectedCrew;
     }
 
     public void addCut(int cut) {
         this.money += cut;
+    }
+
+    public void reduceMoney(int percent) {
+        this.money -= (this.money / 100) * percent;
     }
 }

@@ -2,49 +2,50 @@ package gameMain;
 
 import crew.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class CharacterPool {
-    private  CrewMember[] pool = new CrewMember[10];
+    private static final int POOL_SIZE = 10;
+    private List<CrewMember> pool = new ArrayList<>();
 
     public CharacterPool() {
         generatePool();
     }
 
-    public  CrewMember[] getCharacterPool() {
+    public  List<CrewMember> getCharacterPool() {
         return this.pool;
     }
 
     private void generatePool() {
-        for (int i = 0; i < pool.length; i++) {
+        for (int i = 0; i < POOL_SIZE; i++) {
             int r = GameMain.getRandomInteger(0, 100);
             if (r < 6) {
                 //Partner in Crime
-                pool[i] = new PartnerInCrime();
+                pool.add(new PartnerInCrime());
             } else if (r < 12) {
                 //Hacker
-                pool[i] = new Hacker();
+                pool.add(new Hacker());
             } else if (r < 18) {
                 //Coordinator
-                pool[i] = new Coordinator();
+                pool.add(new Coordinator());
             } else if (r < 30) {
                 //Distraction
-                pool[i] = new Distraction();
+                pool.add(new Distraction());
             } else if (r < 42) {
                 //Driver
-                pool[i] = new Driver();
+                pool.add(new Driver());
             } else if (r < 53) {
                 //ConMan
-                pool[i] = new ConMan();
+                pool.add(new ConMan());
             } else if (r < 65) {
                 //Burglar
-                pool[i] = new Burglar();
+                pool.add(new Burglar());
             } else if (r < 77) {
                 //GadgetGuy
-                pool[i] = new GadgetGuy();
+                pool.add(new GadgetGuy());
             } else {
                 //GunMan
-                pool[i] = new Gunman();
+                pool.add(new Gunman());
             }
         }
     }
@@ -92,14 +93,28 @@ public class CharacterPool {
             }
         }
         System.out.println(Arrays.toString(indexes));
+        int l = this.pool.size();
         for (int i : indexes) {
-            pool[i] = getRandomCrew();
+            if (i >= l) pool.add(getRandomCrew());
+            else pool.set(i, getRandomCrew());
         }
     }
 
     public void switchCharacter(int i, CrewMember crew) {
         if (i < 10 && i >= 0) {
-            pool[i] = crew;
+            pool.set(i, crew);
+        }
+    }
+
+    public void replaceCharacter(int i) {
+        if (i < 10 && i >= 0) {
+            pool.set(i, getRandomCrew());
+        }
+    }
+
+    public void removeCharacter(int i) {
+        if (i < 10 && i >= 0) {
+            pool.remove(i);
         }
     }
 }

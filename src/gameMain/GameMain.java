@@ -8,6 +8,7 @@ public class GameMain {
 
     public static void main(String[] args) {
         Game.initiateSelectionState();
+        Game.initiateHeistState();
     }
 
     public static int getRandomInteger(int min, int max) {
