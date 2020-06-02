@@ -18,35 +18,7 @@ public class CharacterPool {
 
     private void generatePool() {
         for (int i = 0; i < POOL_SIZE; i++) {
-            int r = GameMain.getRandomInteger(0, 100);
-            if (r < 6) {
-                //Partner in Crime
-                pool.add(new PartnerInCrime());
-            } else if (r < 12) {
-                //Hacker
-                pool.add(new Hacker());
-            } else if (r < 18) {
-                //Coordinator
-                pool.add(new Coordinator());
-            } else if (r < 30) {
-                //Distraction
-                pool.add(new Distraction());
-            } else if (r < 42) {
-                //Driver
-                pool.add(new Driver());
-            } else if (r < 53) {
-                //ConMan
-                pool.add(new ConMan());
-            } else if (r < 65) {
-                //Burglar
-                pool.add(new Burglar());
-            } else if (r < 77) {
-                //GadgetGuy
-                pool.add(new GadgetGuy());
-            } else {
-                //GunMan
-                pool.add(new Gunman());
-            }
+            pool.add(getRandomCrew());
         }
     }
 

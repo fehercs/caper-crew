@@ -6,6 +6,7 @@ import crew.Skill;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Game {
@@ -26,16 +27,18 @@ public class Game {
         selectionState();
     }
 
-    public static void initiateHeistState() {
+    public static void heistState() {
         availableHeist.getTests().forEach(test -> {
             nextTest = test;
             printHeistState();
             if (getPlayerConfirm()){
-                var testCrew = getCrewForTest();
-                printTestCrew(testCrew);
+                if (getCrewForTest().isPresent()) {
+//                    attemptTest(getCrewForTest().get());
+                } else {
+//                    failedTests.add(test);
+                }
             }
         });
-        heistState();
     }
 
     public static void selectionState() {
@@ -46,10 +49,10 @@ public class Game {
         }
     }
 
-    private static void heistState() {
-        clearConsole();
-        printHeistState();
-    }
+//    private static void heistState() {
+//        clearConsole();
+//        printHeistState();
+//    }
 
     private static void selectionStateInput() {
         String line = SC.nextLine();
@@ -100,10 +103,7 @@ public class Game {
     }
 
     private static boolean getPlayerConfirm() {
-        if (SC.hasNextLine()) {
-            return true;
-        }
-        return false;
+        return SC.hasNextLine();
     }
 
     private static void addCharacter(int i) {
@@ -140,7 +140,7 @@ public class Game {
                 .append(player.getHeistsLeft())
                 .append("\t\t\t")
                 .append("Money collected: ")
-                .append(player.getMoney())
+                .append(player.getMoney().isPresent() ? player.getMoney() : "Nada")
                 .append("$/")
                 .append(player.getMONEY_GOAL())
                 .append("$\t\t\t")
@@ -262,7 +262,7 @@ public class Game {
         return BUILDER.toString();
     }
 
-    private static List getCrewForTest() {
+    private static Optional<List<CrewMember>> getCrewForTest() {
         var crewForTest = new ArrayList<CrewMember>();
         player.getCurrentCrew().forEach(crewMember -> {
             for (Skill s : crewMember.getSpecialties()) {
@@ -274,8 +274,9 @@ public class Game {
                 .mapToInt(crewMember -> crewMember.getSkills().get(nextTest.getType()))
                 .sum()
                 ;
-        return crewForTest;
+        if (crewForTest.size() > 0) {
+            return Optional.of(crewForTest);
+        }
+        return Optional.empty();
     }
-
-    private static
 }

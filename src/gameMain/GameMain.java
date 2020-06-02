@@ -1,14 +1,13 @@
 package gameMain;
 
 import java.util.Random;
-import crew.*;
 
 public class GameMain {
     private static final Random r = new Random();
 
     public static void main(String[] args) {
         Game.initiateSelectionState();
-        Game.initiateHeistState();
+        Game.heistState();
     }
 
     public static int getRandomInteger(int min, int max) {

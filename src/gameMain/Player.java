@@ -4,6 +4,7 @@ import crew.CrewMember;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Player {
     private final int MONEY_GOAL;
@@ -28,8 +29,9 @@ public class Player {
         return heistsLeft;
     }
 
-    public int getMoney() {
-        return money;
+    public Optional<Integer> getMoney() {
+        if (this.money > 0) return Optional.of(this.money);
+        return Optional.empty();
     }
 
     public List<CrewMember> getCurrentCrew() {
