@@ -13,6 +13,8 @@ public class Game {
     private static final StringBuilder BUILDER = new StringBuilder();
     private static final Scanner SC = new Scanner(System.in);
 
+    private static StringBuilder tempHolder;
+
     public static volatile GameState gameState;
     public static CharacterPool characterPool;
     public static Heist availableHeist;
@@ -24,11 +26,10 @@ public class Game {
         gameState = GameState.SELECTION;
         player = new Player(200000);
         characterPool = new CharacterPool();
-        availableHeist = new Heist();
-        selectionState();
     }
 
     public static void heistState() {
+        tempHolder = new StringBuilder();
         availableHeist.getTests().forEach(test -> {
             nextTest = test;
             clearConsole();
@@ -37,17 +38,136 @@ public class Game {
             if (getCrewForTest().isPresent()) {
                 attemptTest(getCrewForTest().get());
             } else {
+                testFailedResult(test);
                availableHeist.addFailedTest(test);
             }
         });
+        System.out.println(availableHeist.getFailedTests().toString());
+        System.out.println(availableHeist.getSuccesfullTests().toString());
+        promptEnterKey();
         gameState = GameState.SUMMARY;
     }
 
     private static void attemptTest(ArrayList<CrewMember> crewForTest) {
         if (getSkillPointsForTest(crewForTest) < nextTest.getDifficulty()) {
             availableHeist.addFailedTest(nextTest);
+            testFailedResult(nextTest);
         } else {
             availableHeist.addSuccesfullTest(new Container(nextTest, crewForTest));
+        }
+    }
+
+    private static boolean attemptRandomTest(Skill type) {
+        Test test = new Test(type);
+        if (getCrewForRandomTest(test).size() == 0) {
+            randomTestFailedResult();
+            return true;
+        }
+        if (getSkillPointsForTest(getCrewForRandomTest(test)) < test.getDifficulty()) {
+            testFailedResult(test);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private static void randomTestFailedResult() {
+        tempHolder.append("No available crew for random test: All money has been lost!\n");
+        player.reduceGainedReward(availableHeist.getReward());
+    }
+
+    private static void testFailedResult(Test test) {
+        switch (test.getType()) {
+            case DRIVING:
+                int nDriver = (int) player
+                        .getCurrentCrew()
+                        .stream()
+                        .filter(crewMember -> crewMember.getRole().equals("Driver"))
+                        .count();
+                if (nDriver < 2) {
+                    player.reduceGainedReward(availableHeist.getReward());
+                    tempHolder.append("DRIVING test failed and you had only one driver -> All money has been lost.\n");
+                } else {
+                    player.reduceGainedReward(availableHeist.getReward() / 2);
+                    tempHolder.append("DRIVING test failed but you had more than one drivers  -> Half of the money has been lost.\n");
+                }
+                break;
+            case VEHICLE_SELECTION:
+                if (attemptRandomTest(Skill.FIREARM_HANDLING)) {
+                    tempHolder.append("VEHICLE SELECTION test failed and you got into a firefight -> You successfully escaped.\n");
+                } else {
+                    player.reduceGainedReward(availableHeist.getReward());
+                    tempHolder.append("VEHICLE SELECTION test failed. You couldn't escape and got into a firefight -> All money has been lost.\n");
+                }
+                break;
+            case ACCURACY:
+                tempHolder.append("ACCURACY test failed: Friendly fire.");
+                randomCrewDead(1, 100);
+                tempHolder.append("Rewards reduced by 20%.\n");
+                player.reduceGainedReward((availableHeist.getReward() / 100) * 20);
+                break;
+            case FIREARM_HANDLING:
+                player.reduceGainedReward((availableHeist.getReward() / 100) * 10);
+                tempHolder.append("FIREARM HANDLING test failed: You got into a firefight with not enough firepower.\n");
+                randomCrewDead(2, 50);
+                tempHolder.append("Rewards reduced by 10%.\n");
+                break;
+            case REFLEX:
+                if (attemptRandomTest(Skill.SPEED)) {
+                    tempHolder.append("REFLEX test failed: random speed test -> Passed.\n");
+                } else {
+                    tempHolder.append("REFLEX test failed: random speed test -> Failed.\n");
+                    randomCrewDead(1, 100);
+                    player.reduceGainedReward((availableHeist.getReward() / 100) * 70);
+                    tempHolder.append("Rewards reduced by 70%.\n");
+                }
+                break;
+            case STRATEGY:
+                if (attemptRandomTest(Skill.STRATEGY)) {
+                    tempHolder.append("STRATEGY test failed: another random strategy test -> Passed.\n");
+                } else {
+                    tempHolder.append("STRATEGY test failed: another random strategy test -> Failed.\n");
+                }
+                player.reduceGainedReward((availableHeist.getReward() / 100) * 25);
+                tempHolder.append("Rewards reduced by 25%.\n");
+                break;
+            case CHARISMA:
+                if (attemptRandomTest(Skill.STRATEGY)) {
+                    tempHolder.append("CHARISMA test failed: another random strategy test -> Passed.\n");
+                } else {
+                    tempHolder.append("CHARISMA test failed: another random strategy test -> Failed.\n");
+                }
+                player.reduceGainedReward((availableHeist.getReward() / 100) * 15);
+                tempHolder.append("Rewards reduced by 15%.\n");
+                break;
+            case COMPUTER_SKILLS:
+                tempHolder.append("COMPUTER SKILLS test failed -> All money has been lost\n");
+                player.reduceGainedReward(availableHeist.getReward());
+                break;
+            case SPEED:
+                tempHolder.append("SPEED test failed -> Rewards reduced by 30%\n");
+                player.reduceGainedReward((availableHeist.getReward() / 100) * 30);
+                break;
+            case STEALTH:
+                tempHolder.append("STEALTH test failed -> Rewards reduced by 40%\n");
+                player.reduceGainedReward((availableHeist.getReward() / 100) * 40);
+                break;
+        }
+    }
+
+    private static void randomCrewDead(int nDead, int percent) {
+        for (int i = 0; i < nDead; i++) {
+            if (GameMain.getRandomInteger(0, 100) <= percent) {
+                CrewMember dead = player.getCurrentCrew().get(GameMain.getRandomInteger(0, player.getCurrentCrew().size() - 1));
+                player.addDeadCrew(dead);
+                player.removeCrew(dead);
+                tempHolder
+                        .append('\t')
+                        .append("A crew member died: ")
+                        .append(dead.getName())
+                        .append('\n')
+                ;
+            }
         }
     }
 
@@ -60,6 +180,7 @@ public class Game {
     }
 
     public static void selectionState() {
+        availableHeist = new Heist();
         while (gameState.equals(GameState.SELECTION)) {
             clearConsole();
             printSelectionFrame();
@@ -68,11 +189,40 @@ public class Game {
     }
 
     public static void summaryState() {
-        if (availableHeist.hasHeistFailed()) {
+        player.reduceHeistsByOne();
+        int reward = (player.getGainedReward() / 100) * player.getCurrentCut();
+        player.setMoney(reward);
+        clearConsole();
+        renderSummary();
+        promptEnterKey();
+        gameState = GameState.SELECTION;
+    }
 
-        } else {
-
+    private static void renderSummary() {
+        BUILDER.setLength(0);
+        drawHeader();
+        BUILDER.append("-------------------------------------------------------------------------------------------------\n");
+        BUILDER.append("COMPLETED ");
+        drawAvailableHeist(false);
+        BUILDER
+                .append("Collected Reward: ")
+                .append((player.getGainedReward() / 100) * player.getCurrentCut())
+                .append('\n')
+                .append("-------------------------------------------------------------------------------------------------\n")
+        ;
+        if (!availableHeist.hasHeistFailed()) {
+            BUILDER.append("SUCCESFULL TESTS:\n");
+            availableHeist.getSuccesfullTests().forEach( container -> {
+            BUILDER
+                    .append(container.getTest().getType().toString())
+                    .append(" | ")
+            ;
+            });
+            BUILDER.setLength(BUILDER.length() - 3);
+            BUILDER.append("-------------------------------------------------------------------------------------------------\n");
         }
+        BUILDER.append(tempHolder.toString());
+        System.out.println(BUILDER.toString());
     }
 
     private static void selectionStateInput() {
@@ -124,16 +274,18 @@ public class Game {
     }
 
     private static void addCharacter(int i) {
-        player.addCrewMember(characterPool.getCharacterPool().get(i));
-        player.setCurrentCut(player.getCurrentCut() - characterPool.getCharacterPool().get(i).getCutPercent());
-        characterPool.removeCharacter(i);
+        if (characterPool.getCharacterPool().size() > i) {
+            player.addCrewMember(characterPool.getCharacterPool().get(i));
+            player.setCurrentCut(player.getCurrentCut() - characterPool.getCharacterPool().get(i).getCutPercent());
+            characterPool.removeCharacter(i);
+        }
     }
 
     public static void  printSelectionFrame() {
 
         System.out.println(drawHeader());
         System.out.println();
-        System.out.println(drawAvailableHeist());
+        System.out.println(drawAvailableHeist(true));
         System.out.println("-------------------------------------------------------------------------------------------------");
         System.out.println(drawCurrentCrew());
         System.out.println("-------------------------------------------------------------------------------------------------");
@@ -144,7 +296,7 @@ public class Game {
     private static void printHeistState() {
         System.out.println(drawHeader());
         System.out.println();
-        System.out.println(drawAvailableHeist());
+        System.out.println(drawAvailableHeist(true));
         System.out.println("-------------------------------------------------------------------------------------------------");
         System.out.println(drawNextTest());
         System.out.println("-------------------------------------------------------------------------------------------------");
@@ -163,13 +315,15 @@ public class Game {
                 .append("$\t\t\t")
                 .append("Your Cut: ")
                 .append(player.getCurrentCut())
-                .append("%")
+                .append("%\n")
         ;
         return BUILDER.toString();
     }
 
-    private static String drawAvailableHeist() {
-        BUILDER.setLength(0);
+    private static String drawAvailableHeist(boolean zeroB) {
+        if (zeroB) {
+            BUILDER.setLength(0);
+        }
         BUILDER.append("HEIST: ");
         for (Test t : availableHeist.getTests()) {
             BUILDER.append(t.getType());
@@ -181,7 +335,7 @@ public class Game {
                 .append("$ - ")
                 .append("( ")
                 .append((availableHeist.getReward()/100) * player.getCurrentCut())
-                .append("$ )")
+                .append("$ )\n")
         ;
         return BUILDER.toString();
     }
@@ -300,6 +454,16 @@ public class Game {
             return Optional.of(crewForTest);
         }
         return Optional.empty();
+    }
+
+    private static ArrayList<CrewMember> getCrewForRandomTest(Test test) {
+        var crewForTest = new ArrayList<CrewMember>();
+        player.getCurrentCrew().forEach(crewMember -> {
+            for (Skill s : crewMember.getSpecialties()) {
+                if (s.getValue() == nextTest.getType().getValue()) crewForTest.add(crewMember);
+            }
+        });
+        return crewForTest;
     }
 
 

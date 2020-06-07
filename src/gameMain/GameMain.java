@@ -7,9 +7,14 @@ public class GameMain {
 
     public static void main(String[] args) {
         Game.initiateSelectionState();
-        Game.heistState();
-        Game.summaryState();
+        while (true) {
+            Game.selectionState();
+            Game.heistState();
+            Game.summaryState();
+        }
     }
+
+
 
     public static int getRandomInteger(int min, int max) {
         return r.nextInt(max + 1 - min) + min;

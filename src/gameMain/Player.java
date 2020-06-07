@@ -10,7 +10,9 @@ public class Player {
     private final int MONEY_GOAL;
     private int heistsLeft;
     private int money;
+    private int gainedReward;
     private List<CrewMember> currentCrew;
+    private ArrayList<CrewMember> deadCrew;
     private int currentCut;
 
 
@@ -19,6 +21,7 @@ public class Player {
         this.heistsLeft = 20;
         this.money = 0;
         this.currentCrew = new ArrayList<>();
+        this.deadCrew = new ArrayList<>();
         this.currentCut = 100;
     }
 
@@ -35,6 +38,10 @@ public class Player {
         return Optional.empty();
     }
 
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
     public List<CrewMember> getCurrentCrew() {
         return currentCrew;
     }
@@ -45,6 +52,30 @@ public class Player {
 
     public void setCurrentCut(int currentCut) {
         this.currentCut = currentCut;
+    }
+
+    public ArrayList<CrewMember> getDeadCrew() {
+        return deadCrew;
+    }
+
+    public void addDeadCrew(CrewMember dead) {
+        this.deadCrew.add(dead);
+    }
+
+    public int getGainedReward() {
+        return gainedReward;
+    }
+
+    public void setGainedReward(int gainedReward) {
+        this.gainedReward = gainedReward;
+    }
+
+    public void reduceGainedReward(int red) {
+        if (this.gainedReward - red <= 0){
+            this.gainedReward = 0;
+        } else {
+            this.gainedReward -= red;
+        }
     }
 
     public void reduceHeistsByOne() {
@@ -65,5 +96,9 @@ public class Player {
 
     public void reduceMoney(int percent) {
         this.money -= (this.money / 100) * percent;
+    }
+
+    public void removeCrew(CrewMember crew) {
+        this.currentCrew.remove(crew);
     }
 }

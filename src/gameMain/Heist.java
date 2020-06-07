@@ -44,6 +44,10 @@ public class Heist {
         return reward;
     }
 
+    public void setReward(int reward) {
+        this.reward = reward;
+    }
+
     public ArrayList<Test> getFailedTests() {
         return failedTests;
     }
