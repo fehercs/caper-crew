@@ -50,7 +50,7 @@ public class Game {
     }
 
     private static void attemptTest(ArrayList<CrewMember> crewForTest) {
-        if (getSkillPointsForTest(crewForTest) < nextTest.getDifficulty()) {
+        if (getSkillPointsForTest(crewForTest, nextTest) < nextTest.getDifficulty()) {
             availableHeist.addFailedTest(nextTest);
             testFailedResult(nextTest);
         } else {
@@ -64,7 +64,7 @@ public class Game {
             randomTestFailedResult();
             return true;
         }
-        if (getSkillPointsForTest(getCrewForRandomTest(test)) < test.getDifficulty()) {
+        if (getSkillPointsForTest(getCrewForRandomTest(test), test) < test.getDifficulty()) {
             testFailedResult(test);
             return false;
         } else {
@@ -172,10 +172,10 @@ public class Game {
         }
     }
 
-    private static int getSkillPointsForTest(List<CrewMember> crewForTest) {
+    private static int getSkillPointsForTest(List<CrewMember> crewForTest, Test test) {
        return crewForTest
                 .stream()
-                .mapToInt(crewMember -> crewMember.getSkills().get(nextTest.getType()))
+                .mapToInt(crewMember -> crewMember.getSkills().get(test.getType()))
                 .sum()
                 ;
     }
@@ -195,6 +195,7 @@ public class Game {
         player.setMoney(reward);
         clearConsole();
         renderSummary();
+        characterLevelUp();
         promptEnterKey();
         gameState = GameState.SELECTION;
     }
@@ -209,6 +210,7 @@ public class Game {
                 .append("Collected Reward: ")
                 .append((player.getGainedReward() / 100) * player.getCurrentCut())
                 .append('\n')
+                .append("Characters participating in a successful test gained 5 skill points for that skill.")
                 .append("-------------------------------------------------------------------------------------------------\n")
         ;
         if (!availableHeist.hasHeistFailed()) {
@@ -509,6 +511,20 @@ public class Game {
             }
         });
         return crewForTest;
+    }
+
+    private static void characterLevelUp() {
+        player.getCurrentCrew().forEach(crewMember -> crewMember.getSkills().forEach((skill, integer) -> integer++));
+        availableHeist.getSuccesfullTests()
+                .forEach(container -> container.getCrew()
+                        .stream()
+                        .flatMap(crewMember -> {
+                            player.getCurrentCrew().stream()
+                                    .filter(crew -> crew.getName().equals(crewMember.getName())
+                            )
+                            )
+                            .forEach(playerCrewMember -> playerCrewMember.increaseSkill(container.getTest().getType(), 5))
+                            ;
     }
 
 

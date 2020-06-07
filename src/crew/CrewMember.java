@@ -84,4 +84,8 @@ public abstract class CrewMember {
     public int getCutPercent() {
         return cutPercent;
     }
+
+    public void increaseSkill(Skill skill, int value) {
+        this.skills.put(skill, this.skills.get(skill) + value);
+    }
 }
