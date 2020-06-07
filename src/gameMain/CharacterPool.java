@@ -59,7 +59,7 @@ public class CharacterPool {
         int counter = 0;
         while (counter < 5) {
             int r = GameMain.getRandomInteger(0, 9);
-            if (!Arrays.stream(indexes).anyMatch(e -> e == r)) {
+            if (Arrays.stream(indexes).noneMatch(e -> e == r)) {
                 indexes[counter] = r;
                 counter++;
             }

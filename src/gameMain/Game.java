@@ -3,7 +3,7 @@ package gameMain;
 import crew.CrewMember;
 import crew.Skill;
 
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +18,7 @@ public class Game {
     public static Heist availableHeist;
     public static Player player;
     public static Test nextTest;
+    public static boolean prevTestFailed;
 
     public static void initiateSelectionState() {
         gameState = GameState.SELECTION;
@@ -30,15 +31,32 @@ public class Game {
     public static void heistState() {
         availableHeist.getTests().forEach(test -> {
             nextTest = test;
+            clearConsole();
             printHeistState();
-            if (getPlayerConfirm()){
-                if (getCrewForTest().isPresent()) {
-//                    attemptTest(getCrewForTest().get());
-                } else {
-//                    failedTests.add(test);
-                }
+            promptEnterKey();
+            if (getCrewForTest().isPresent()) {
+                attemptTest(getCrewForTest().get());
+            } else {
+               availableHeist.addFailedTest(test);
             }
         });
+        gameState = GameState.SUMMARY;
+    }
+
+    private static void attemptTest(ArrayList<CrewMember> crewForTest) {
+        if (getSkillPointsForTest(crewForTest) < nextTest.getDifficulty()) {
+            availableHeist.addFailedTest(nextTest);
+        } else {
+            availableHeist.addSuccesfullTest(new Container(nextTest, crewForTest));
+        }
+    }
+
+    private static int getSkillPointsForTest(List<CrewMember> crewForTest) {
+       return crewForTest
+                .stream()
+                .mapToInt(crewMember -> crewMember.getSkills().get(nextTest.getType()))
+                .sum()
+                ;
     }
 
     public static void selectionState() {
@@ -49,10 +67,13 @@ public class Game {
         }
     }
 
-//    private static void heistState() {
-//        clearConsole();
-//        printHeistState();
-//    }
+    public static void summaryState() {
+        if (availableHeist.hasHeistFailed()) {
+
+        } else {
+
+        }
+    }
 
     private static void selectionStateInput() {
         String line = SC.nextLine();
@@ -100,10 +121,6 @@ public class Game {
                 addCharacter(9);
                 break;
         }
-    }
-
-    private static boolean getPlayerConfirm() {
-        return SC.hasNextLine();
     }
 
     private static void addCharacter(int i) {
@@ -220,7 +237,6 @@ public class Game {
             BUILDER.append(String.format("%-5s%-10s%-20s%-10d%-10s%-20s%-10s%-20s%-10s%-10s%-10s%-20s%-10s%-10s\n", index,name,role,c.getCutPercent(),s[0],s[1],s[2],s[3],s[4],s[5],s[6],s[7],s[8],s[9]));
             i++;
         }
-        if (player.getHeistsLeft() == 20) BUILDER.append("Yes it's free in the first round... Good Luck!");
         return BUILDER.toString();
     }
 
@@ -230,6 +246,7 @@ public class Game {
                 .append("\n-- Type [SKIP] to skip this heist - this will reduce your remaining heists!\n")
                 .append("-- Enter [0-9] to add a crew member to your team!\n")
                 .append("-- Enter [REPLACE] to replace 5 characters in the pool for 5% of your money!\n")
+                .append(player.getHeistsLeft() == 20 ? "Yes it's free in the first round... Good Luck!" : "")
                 .append("\n-- Type [DONE] to start the Heist!\n")
                 .append("Enter command here:")
         ;
@@ -247,8 +264,18 @@ public class Game {
     }
 
     private static boolean confirm() {
+        clearConsole();
         System.out.println("Are you sure?\n-- Type [Y] if yes!");
         return SC.nextLine().equalsIgnoreCase("Y");
+    }
+
+    private static void promptEnterKey(){
+        System.out.println("Press \"ENTER\" to continue...");
+        try {
+            int read = System.in.read(new byte[2]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static String drawNextTest() {
@@ -262,21 +289,18 @@ public class Game {
         return BUILDER.toString();
     }
 
-    private static Optional<List<CrewMember>> getCrewForTest() {
+    private static Optional<ArrayList<CrewMember>> getCrewForTest() {
         var crewForTest = new ArrayList<CrewMember>();
         player.getCurrentCrew().forEach(crewMember -> {
             for (Skill s : crewMember.getSpecialties()) {
                 if (s.getValue() == nextTest.getType().getValue()) crewForTest.add(crewMember);
             }
         });
-        int skillPointForTest = crewForTest
-                .stream()
-                .mapToInt(crewMember -> crewMember.getSkills().get(nextTest.getType()))
-                .sum()
-                ;
         if (crewForTest.size() > 0) {
             return Optional.of(crewForTest);
         }
         return Optional.empty();
     }
+
+
 }

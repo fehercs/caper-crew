@@ -13,6 +13,7 @@ public class Player {
     private List<CrewMember> currentCrew;
     private int currentCut;
 
+
     public Player(int MONEY_GOAL) {
         this.MONEY_GOAL = MONEY_GOAL;
         this.heistsLeft = 20;
