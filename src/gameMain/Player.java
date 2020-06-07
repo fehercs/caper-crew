@@ -83,6 +83,7 @@ public class Player {
     }
 
     public void addCrewMember(CrewMember crew) {
+        this.currentCut -= crew.getCutPercent();
         this.currentCrew.add(crew);
     }
 
@@ -100,5 +101,10 @@ public class Player {
 
     public void removeCrew(CrewMember crew) {
         this.currentCrew.remove(crew);
+    }
+
+    public void removeCrew(int index) {
+        this.currentCut += this.currentCrew.get(index).getCutPercent();
+        this.currentCrew.remove(index);
     }
 }

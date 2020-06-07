@@ -17,7 +17,7 @@ public class Heist {
 
     public Heist() {
         generateTests();
-        this.reward = GameMain.getRandomInteger(20, 120) * 1000;
+        this.reward = generateSkillBasedReward();
         this.failedTests = new ArrayList<>();
         this.succesfullTests = new ArrayList<>();
     }
@@ -34,6 +34,13 @@ public class Heist {
         if (GameMain.getRandomInteger(1, 4) == 1) {
             tests.addFirst(new Test(Skill.DRIVING));
         }
+    }
+
+    private int generateSkillBasedReward() {
+        int skillSum = tests.stream()
+                .mapToInt(Test::getDifficulty)
+                .sum();
+        return (((skillSum * GameMain.getRandomInteger(80, 180)) + 999) / 1000 ) * 1000;
     }
 
     public LinkedList<Test> getTests() {

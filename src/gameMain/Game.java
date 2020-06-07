@@ -29,6 +29,7 @@ public class Game {
     }
 
     public static void heistState() {
+        player.setGainedReward(availableHeist.getReward());
         tempHolder = new StringBuilder();
         availableHeist.getTests().forEach(test -> {
             nextTest = test;
@@ -219,7 +220,9 @@ public class Game {
             ;
             });
             BUILDER.setLength(BUILDER.length() - 3);
-            BUILDER.append("-------------------------------------------------------------------------------------------------\n");
+            BUILDER
+                    .append('\n')
+                    .append("-------------------------------------------------------------------------------------------------\n");
         }
         BUILDER.append(tempHolder.toString());
         System.out.println(BUILDER.toString());
@@ -270,14 +273,55 @@ public class Game {
             case "9":
                 addCharacter(9);
                 break;
+            case "A":
+                removeCharacter(0);
+                break;
+            case "B":
+                removeCharacter(1);
+                break;
+            case "C":
+                removeCharacter(2);
+                break;
+            case "D":
+                removeCharacter(3);
+                break;
+            case "E":
+                removeCharacter(4);
+                break;
+            case "F":
+                removeCharacter(5);
+                break;
+            case "G":
+                removeCharacter(6);
+                break;
+            case "H":
+                removeCharacter(7);
+                break;
+            case "I":
+                removeCharacter(8);
+                break;
+            case "J":
+                removeCharacter(9);
+                break;
         }
     }
 
-    private static void addCharacter(int i) {
-        if (characterPool.getCharacterPool().size() > i) {
-            player.addCrewMember(characterPool.getCharacterPool().get(i));
-            player.setCurrentCut(player.getCurrentCut() - characterPool.getCharacterPool().get(i).getCutPercent());
-            characterPool.removeCharacter(i);
+    private static void addCharacter(int index) {
+        if (characterPool.getCharacterPool().size() > index) {
+            if (player.getCurrentCut() - characterPool.getCharacterPool().get(index).getCutPercent() > 0) {
+                player.addCrewMember(characterPool.getCharacterPool().get(index));
+                characterPool.removeCharacter(index);
+            } else {
+                clearConsole();
+                System.out.println("CANNOT ADD CREW MEMBER -- your cut cannot be at or bellow 0!");
+                promptEnterKey();
+            }
+        }
+    }
+
+    private static void removeCharacter(int index) {
+        if (player.getCurrentCrew().size() > index) {
+            player.removeCrew(index);
         }
     }
 
@@ -309,7 +353,7 @@ public class Game {
                 .append(player.getHeistsLeft())
                 .append("\t\t\t")
                 .append("Money collected: ")
-                .append(player.getMoney().isPresent() ? player.getMoney() : "Nada")
+                .append(player.getMoney().isPresent() ? player.getMoney().get() : "Nada")
                 .append("$/")
                 .append(player.getMONEY_GOAL())
                 .append("$\t\t\t")
@@ -399,6 +443,7 @@ public class Game {
         BUILDER
                 .append("\n-- Type [SKIP] to skip this heist - this will reduce your remaining heists!\n")
                 .append("-- Enter [0-9] to add a crew member to your team!\n")
+                .append("-- Enter [A-J] to remove a crew member from your team!\n")
                 .append("-- Enter [REPLACE] to replace 5 characters in the pool for 5% of your money!\n")
                 .append(player.getHeistsLeft() == 20 ? "Yes it's free in the first round... Good Luck!" : "")
                 .append("\n-- Type [DONE] to start the Heist!\n")
