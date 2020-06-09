@@ -32,10 +32,11 @@ public class Heist {
     }
 
     private int generateSkillBasedReward() {
-        int skillSum = tests.stream()
+        int skillSum = (int)tests.stream()
                 .mapToInt(Test::getDifficulty)
-                .sum();
-        return (((skillSum * GameMain.getRandomInteger(80, 180)) + 999) / 1000 ) * 1000;
+                .average()
+                .orElse(75);
+        return (((skillSum * GameMain.getRandomInteger(800, 1200)) + 999) / 1000 ) * 1000;
     }
 
     public LinkedList<Test> getTests() {

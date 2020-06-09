@@ -16,13 +16,13 @@ public abstract class CrewMember {
 
     public CrewMember(String role, int roleLimit, int skillsBonus, Skill[] specialties, String description, int roleCut) {
         this.name = getRandomName();
-        this.skills = generateSkills();
 
         this.role = role;
         this.roleLimit = roleLimit;
         this.skillsBonus = skillsBonus;
         this.specialties = specialties;
         this.description = description;
+        this.skills = generateSkills(specialties);
         this.cutPercent = (Collections.max(skills.values()) / 10) + roleCut;
     }
 
@@ -49,6 +49,33 @@ public abstract class CrewMember {
         var map = new TreeMap<Skill, Integer>();
         for (Skill skill : Skill.values()) {
             map.put(skill, GameMain.getRandomInteger(1, 100));
+        }
+        return map;
+    }
+
+    private static TreeMap<Skill, Integer> generateSkills(Skill[] spec) {
+        var set = new TreeSet<Integer>();
+        var map = new TreeMap<Skill, Integer>();
+        for (int i = 0; i < 12; i++) {
+            set.add(GameMain.getRandomInteger(1, 100));
+        }
+        var dit = set.descendingIterator();
+        var ait = set.iterator();
+        int top = dit.next();
+        int bottom = ait.next();
+        int counter = 0;
+        while (counter < Skill.values().length) {
+            var skill = Skill.getARandomSkill();
+            if (!map.containsKey(skill)) {
+                if (Arrays.asList(spec).contains(skill)) {
+                    map.put(skill, top);
+                    top = dit.next();
+                } else {
+                    map.put(skill, bottom);
+                    bottom = ait.next();
+                }
+                counter++;
+            }
         }
         return map;
     }

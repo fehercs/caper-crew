@@ -20,7 +20,6 @@ public class Game {
     public static Heist availableHeist;
     public static Player player;
     public static Test nextTest;
-    public static boolean prevTestFailed;
 
     public static void initiateSelectionState() {
         gameState = GameState.SELECTION;
@@ -31,11 +30,10 @@ public class Game {
     public static void heistState() {
         player.setGainedReward(availableHeist.getReward());
         tempHolder = new StringBuilder();
+        clearConsole();
         availableHeist.getTests().forEach(test -> {
             nextTest = test;
-            clearConsole();
             printHeistState();
-            promptEnterKey();
             if (getCrewForTest().isPresent()) {
                 attemptTest(getCrewForTest().get());
             } else {
@@ -43,6 +41,7 @@ public class Game {
                availableHeist.addFailedTest(test);
             }
         });
+        promptEnterKey();
         System.out.println(availableHeist.getFailedTests().toString());
         System.out.println(availableHeist.getSuccesfullTests().toString());
         promptEnterKey();
@@ -159,15 +158,17 @@ public class Game {
     private static void randomCrewDead(int nDead, int percent) {
         for (int i = 0; i < nDead; i++) {
             if (GameMain.getRandomInteger(0, 100) <= percent) {
-                CrewMember dead = player.getCurrentCrew().get(GameMain.getRandomInteger(0, player.getCurrentCrew().size() - 1));
-                player.addDeadCrew(dead);
-                player.removeCrew(dead);
-                tempHolder
-                        .append('\t')
-                        .append("A crew member died: ")
-                        .append(dead.getName())
-                        .append('\n')
-                ;
+                if (player.getCurrentCrew().size() > 0) {
+                    CrewMember dead = player.getCurrentCrew().get(GameMain.getRandomInteger(0, player.getCurrentCrew().size() - 1));
+                    player.addDeadCrew(dead);
+                    player.removeCrew(dead);
+                    tempHolder
+                            .append('\t')
+                            .append("A crew member died: ")
+                            .append(dead.getName())
+                            .append('\n')
+                    ;
+                }
             }
         }
     }
@@ -192,7 +193,7 @@ public class Game {
     public static void summaryState() {
         player.reduceHeistsByOne();
         int reward = (player.getGainedReward() / 100) * player.getCurrentCut();
-        player.setMoney(reward);
+        player.setMoney(player.getMoney().isPresent() ? player.getMoney().get() + reward : reward);
         clearConsole();
         renderSummary();
         characterLevelUp();
@@ -210,7 +211,8 @@ public class Game {
                 .append("Collected Reward: ")
                 .append((player.getGainedReward() / 100) * player.getCurrentCut())
                 .append('\n')
-                .append("Characters participating in a successful test gained 5 skill points for that skill.")
+                .append("Every crew member got a skill point for all their skills.\n")
+                .append("Characters participating in a successful test also gained 5 skill points for that skill.\n")
                 .append("-------------------------------------------------------------------------------------------------\n")
         ;
         if (!availableHeist.hasHeistFailed()) {
@@ -514,17 +516,20 @@ public class Game {
     }
 
     private static void characterLevelUp() {
-        player.getCurrentCrew().forEach(crewMember -> crewMember.getSkills().forEach((skill, integer) -> integer++));
-        availableHeist.getSuccesfullTests()
-                .forEach(container -> container.getCrew()
-                        .stream()
-                        .flatMap(crewMember -> {
-                            player.getCurrentCrew().stream()
-                                    .filter(crew -> crew.getName().equals(crewMember.getName())
-                            )
-                            )
-                            .forEach(playerCrewMember -> playerCrewMember.increaseSkill(container.getTest().getType(), 5))
-                            ;
+        player.getCurrentCrew().forEach(crewMember -> {
+                    crewMember.getSkills().forEach((skill, integer) -> {
+                        crewMember.getSkills().put(skill, integer + 1);
+                    });
+        });
+        availableHeist.getSuccesfullTests().forEach( container -> {
+            container.getCrew().forEach( crew -> {
+                crew.getSkills().forEach( (skill, integer) -> {
+                    if (container.getTest().getType().equals(skill)) {
+                        crew.getSkills().put(skill, integer + 4);
+                    }
+                });
+            });
+        });
     }
 
 
