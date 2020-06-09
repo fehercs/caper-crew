@@ -31,30 +31,31 @@ public class Game {
         player.setGainedReward(availableHeist.getReward());
         tempHolder = new StringBuilder();
         clearConsole();
+        printHeistState();
         availableHeist.getTests().forEach(test -> {
             nextTest = test;
-            printHeistState();
+            String skillPointsForTest = "None";
             if (getCrewForTest().isPresent()) {
-                attemptTest(getCrewForTest().get());
+                skillPointsForTest = Integer.toString(attemptTest(getCrewForTest().get()));
             } else {
                 testFailedResult(test);
-               availableHeist.addFailedTest(test);
+                availableHeist.addFailedTest(test);
             }
+            printHeistTestState(skillPointsForTest);
         });
-        promptEnterKey();
-        System.out.println(availableHeist.getFailedTests().toString());
-        System.out.println(availableHeist.getSuccesfullTests().toString());
         promptEnterKey();
         gameState = GameState.SUMMARY;
     }
 
-    private static void attemptTest(ArrayList<CrewMember> crewForTest) {
-        if (getSkillPointsForTest(crewForTest, nextTest) < nextTest.getDifficulty()) {
+    private static int attemptTest(ArrayList<CrewMember> crewForTest) {
+        int skillPoints = getSkillPointsForTest(crewForTest, nextTest);
+        if ( skillPoints < nextTest.getDifficulty()) {
             availableHeist.addFailedTest(nextTest);
             testFailedResult(nextTest);
         } else {
             availableHeist.addSuccesfullTest(new Container(nextTest, crewForTest));
         }
+        return skillPoints;
     }
 
     private static boolean attemptRandomTest(Skill type) {
@@ -211,8 +212,7 @@ public class Game {
                 .append("Collected Reward: ")
                 .append((player.getGainedReward() / 100) * player.getCurrentCut())
                 .append('\n')
-                .append("Every crew member got a skill point for all their skills.\n")
-                .append("Characters participating in a successful test also gained 5 skill points for that skill.\n")
+
                 .append("-------------------------------------------------------------------------------------------------\n")
         ;
         if (!availableHeist.hasHeistFailed()) {
@@ -228,7 +228,10 @@ public class Game {
                     .append('\n')
                     .append("-------------------------------------------------------------------------------------------------\n");
         }
-        BUILDER.append(tempHolder.toString());
+        BUILDER.append(tempHolder.toString())
+                .append("\nEvery crew member got a skill point for all their skills.\n")
+                .append("Characters participating in a successful test also gained 5 skill points for that skill.\n")
+        ;
         System.out.println(BUILDER.toString());
     }
 
@@ -345,8 +348,12 @@ public class Game {
         System.out.println(drawHeader());
         System.out.println();
         System.out.println(drawAvailableHeist(true));
+        System.out.println("Tests in detail:");
         System.out.println("-------------------------------------------------------------------------------------------------");
-        System.out.println(drawNextTest());
+    }
+
+    private static void printHeistTestState(String skillPoints) {
+        System.out.println(drawNextTest(skillPoints));
         System.out.println("-------------------------------------------------------------------------------------------------");
     }
 
@@ -481,13 +488,17 @@ public class Game {
         }
     }
 
-    private static String drawNextTest() {
+    private static String drawNextTest(String skillPoints) {
         BUILDER.setLength(0);
         BUILDER
-                .append("UPCOMING TEST:\t")
-                .append(nextTest.getType().toString().toUpperCase())
-                .append("\tDifficulty: ")
-                .append(nextTest.getDifficulty())
+                .append("\t")
+                .append(String.format("%-20s\t%-12s%-5d\t%-15s%-5s",
+                        nextTest.getType().toString().toUpperCase(),
+                        "Difficulty: ",
+                        nextTest.getDifficulty(),
+                        "Crew skill points: ",
+                        skillPoints
+                ))
         ;
         return BUILDER.toString();
     }

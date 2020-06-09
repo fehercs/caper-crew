@@ -100,6 +100,7 @@ public class Player {
     }
 
     public void removeCrew(CrewMember crew) {
+        this.currentCut += this.currentCrew.get(this.currentCrew.indexOf(crew)).getCutPercent();
         this.currentCrew.remove(crew);
     }
 

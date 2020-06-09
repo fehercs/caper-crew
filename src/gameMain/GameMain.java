@@ -6,6 +6,7 @@ public class GameMain {
     private static final Random r = new Random();
 
     public static void main(String[] args) {
+        Menu.renderMenu();
         Game.initiateSelectionState();
         while (true) {
             Game.selectionState();
