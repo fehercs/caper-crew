@@ -54,13 +54,14 @@ public abstract class CrewMember {
     }
 
     private static TreeMap<Skill, Integer> generateSkills(Skill[] spec) {
-        var set = new TreeSet<Integer>();
+        var list = new LinkedList<Integer>();
         var map = new TreeMap<Skill, Integer>();
-        for (int i = 0; i < 12; i++) {
-            set.add(GameMain.getRandomInteger(1, 100));
+        for (int i = 0; i < Skill.values().length; i++) {
+            list.add(GameMain.getRandomInteger(1, 100));
         }
-        var dit = set.descendingIterator();
-        var ait = set.iterator();
+        Collections.sort(list);
+        var dit = list.descendingIterator();
+        var ait = list.iterator();
         int top = dit.next();
         int bottom = ait.next();
         int counter = 0;

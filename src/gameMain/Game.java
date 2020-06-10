@@ -20,6 +20,7 @@ public class Game {
     public static Heist availableHeist;
     public static Player player;
     public static Test nextTest;
+    private static int nRandomFail;
 
     public static void initiateSelectionState() {
         gameState = GameState.SELECTION;
@@ -33,6 +34,7 @@ public class Game {
         clearConsole();
         printHeistState();
         availableHeist.getTests().forEach(test -> {
+            nRandomFail = 0;
             nextTest = test;
             String skillPointsForTest = "None";
             if (getCrewForTest().isPresent()) {
@@ -59,8 +61,9 @@ public class Game {
     }
 
     private static boolean attemptRandomTest(Skill type) {
+        nRandomFail++;
         Test test = new Test(type);
-        if (getCrewForRandomTest(test).size() == 0) {
+        if (getCrewForRandomTest(test).size() == 0 || nRandomFail > 5) {
             randomTestFailedResult();
             return true;
         }
@@ -73,7 +76,7 @@ public class Game {
     }
 
     private static void randomTestFailedResult() {
-        tempHolder.append("No available crew for random test: All money has been lost!\n");
+        tempHolder.append("Random test failed too many times: All money has been lost!\n");
         player.reduceGainedReward(availableHeist.getReward());
     }
 
@@ -184,10 +187,12 @@ public class Game {
 
     public static void selectionState() {
         availableHeist = new Heist();
+        gameState = GameState.SELECTION;
         while (gameState.equals(GameState.SELECTION)) {
             clearConsole();
             printSelectionFrame();
             selectionStateInput();
+            GameMain.checkGameOver();
         }
     }
 
@@ -199,7 +204,6 @@ public class Game {
         renderSummary();
         characterLevelUp();
         promptEnterKey();
-        gameState = GameState.SELECTION;
     }
 
     private static void renderSummary() {
@@ -456,7 +460,7 @@ public class Game {
                 .append("-- Enter [0-9] to add a crew member to your team!\n")
                 .append("-- Enter [A-J] to remove a crew member from your team!\n")
                 .append("-- Enter [REPLACE] to replace 5 characters in the pool for 5% of your money!\n")
-                .append(player.getHeistsLeft() == 20 ? "Yes it's free in the first round... Good Luck!" : "")
+                .append(player.getMoney().isEmpty() ? "Yes it's free if you have no money... Good Luck!" : "")
                 .append("\n-- Type [DONE] to start the Heist!\n")
                 .append("Enter command here:")
         ;

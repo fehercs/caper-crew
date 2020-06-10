@@ -132,6 +132,20 @@ public class Menu {
         System.out.println(SB.toString());
     }
 
+    public static void renderGameOver() {
+        if (Game.player.getMoney().isPresent()) {
+            int money = Game.player.getMoney().get();
+            if (money >= Game.player.getMONEY_GOAL()) {
+                clearConsole();
+                System.out.println("Congratulations! You WON!");
+            }
+        }
+        if (Game.player.getHeistsLeft() <= 0) {
+            clearConsole();
+            System.out.println("Game Over!");
+        }
+    }
+
 
 
     private static void promptEnterKey(){
