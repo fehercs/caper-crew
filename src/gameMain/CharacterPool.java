@@ -6,6 +6,8 @@ import java.util.*;
 
 public class CharacterPool {
     private static final int POOL_SIZE = 10;
+    public static ArrayList<String> uniqueNameHolder = new ArrayList<>();
+
     private List<CrewMember> pool = new ArrayList<>();
 
     public CharacterPool() {
@@ -64,23 +66,10 @@ public class CharacterPool {
                 counter++;
             }
         }
-        System.out.println(Arrays.toString(indexes));
         int l = this.pool.size();
         for (int i : indexes) {
             if (i >= l) pool.add(getRandomCrew());
             else pool.set(i, getRandomCrew());
-        }
-    }
-
-    public void switchCharacter(int i, CrewMember crew) {
-        if (i < 10 && i >= 0) {
-            pool.set(i, crew);
-        }
-    }
-
-    public void replaceCharacter(int i) {
-        if (i < 10 && i >= 0) {
-            pool.set(i, getRandomCrew());
         }
     }
 

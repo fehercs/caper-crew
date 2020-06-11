@@ -59,6 +59,7 @@ public class Player {
     }
 
     public void addDeadCrew(CrewMember dead) {
+        CharacterPool.uniqueNameHolder.remove(dead.getName());
         this.deadCrew.add(dead);
     }
 

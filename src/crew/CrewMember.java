@@ -2,9 +2,11 @@ package crew;
 
 import java.util.*;
 
+import gameMain.CharacterPool;
 import gameMain.GameMain;
 
 public abstract class CrewMember {
+
     private String name;
     private String role;
     private int roleLimit;
@@ -42,16 +44,27 @@ public abstract class CrewMember {
 
     private static String getRandomName() {
         var isFemale = new Random().nextBoolean();
-        return isFemale ? "Ms. " + (char) GameMain.getRandomInteger(65, 90) : "Mr. " + (char) GameMain.getRandomInteger(65, 90);
+        int random = 64;
+        boolean unique = false;
+        String name = "";
+        while (!unique) {
+            random = GameMain.getRandomInteger(65, 90);
+            name = isFemale ? "Ms. " + (char) random : "Mr. " + (char) random;
+            if (!CharacterPool.uniqueNameHolder.contains(name)) {
+                unique = true;
+                CharacterPool.uniqueNameHolder.add(name);
+            }
+        }
+        return isFemale ? "Ms. " + (char) random : "Mr. " + (char) random;
     }
 
-    private static TreeMap<Skill, Integer> generateSkills() {
-        var map = new TreeMap<Skill, Integer>();
-        for (Skill skill : Skill.values()) {
-            map.put(skill, GameMain.getRandomInteger(1, 100));
-        }
-        return map;
-    }
+//    private static TreeMap<Skill, Integer> generateSkills() {
+//        var map = new TreeMap<Skill, Integer>();
+//        for (Skill skill : Skill.values()) {
+//            map.put(skill, GameMain.getRandomInteger(1, 100));
+//        }
+//        return map;
+//    }
 
     private static TreeMap<Skill, Integer> generateSkills(Skill[] spec) {
         var list = new LinkedList<Integer>();
