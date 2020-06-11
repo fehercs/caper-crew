@@ -5,11 +5,38 @@ import java.io.IOException;
 public class Menu {
     private static final StringBuilder SB = new StringBuilder();
     private static final int TIMING = 400;
+    private static boolean run = true;
 
-    public static void renderMenu() {
-        clearConsole();
-        renderNE();
-        promptEnterKey();
+    public static void renderMenu() throws InterruptedException {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    int read = System.in.read(new byte[2]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                run = false;
+            }
+        });
+        t.start();
+        while (run) {
+            clearConsole();
+            renderNE();
+            Thread.sleep(GameMain.getRandomInteger(800, 1500));
+            clearConsole();
+            renderSE();
+            Thread.sleep(100);
+            clearConsole();
+            renderNE();
+            Thread.sleep(GameMain.getRandomInteger(300, 800));
+            clearConsole();
+            renderSE();
+            Thread.sleep(100);
+            clearConsole();
+            renderNE();
+            Thread.sleep(GameMain.getRandomInteger(200, 800));
+        }
     }
 
     private static void renderNE() {
@@ -26,7 +53,8 @@ public class Menu {
                         " \\______/  \\_______/| $$____/  \\_______/|__/             \\______/ |__/       \\_______/ \\_____/\\___/ \n" +
                         "                    | $$                                                                            \n" +
                         "                    | $$                                                                            \n" +
-                        "                    |__/                                                                            \n")
+                        "                    |__/                                                                            \n\n" +
+                        "\t\t\t\t\tPress ENTER to continue!\n")
                 ;
         System.out.println(SB.toString());
     }
@@ -69,7 +97,8 @@ public class Menu {
                         "  \\$$$$$$   \\$$$$$$$| $$$$$$$   \\$$$$$$$ \\$$              \\$$$$$$  \\$$        \\$$$$$$$  \\$$$$$\\$$$$ \n" +
                         "                    | $$                                                                            \n" +
                         "                    | $$                                                                            \n" +
-                        "                     \\$$                                                                            \n")
+                        "                     \\$$                                                                            \n" +
+                        "\t\t\t\t\tPress ENTER to continue!\n")
         ;
         System.out.println(SB.toString());
     }
@@ -89,7 +118,8 @@ public class Menu {
                         " $$$$$$/   $$$$$$$/ $$$$$$$/   $$$$$$$/ $$/              $$$$$$/  $$/        $$$$$$$/  $$$$$/$$$$/  \n" +
                         "                    $$ |                                                                            \n" +
                         "                    $$ |                                                                            \n" +
-                        "                    $$/                                                                             \n")
+                        "                    $$/                                                                             \n" +
+                        "\t\t\t\t\tPress ENTER to continue!\n")
         ;
         System.out.println(SB.toString());
     }

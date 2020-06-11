@@ -6,7 +6,11 @@ public class GameMain {
     private static final Random r = new Random();
 
     public static void main(String[] args) {
-        Menu.renderMenu();
+        try {
+            Menu.renderMenu();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Game.initiateSelectionState();
         while (!(Game.gameState == GameState.OVER)) {
             Game.selectionState();
