@@ -76,7 +76,7 @@ public class Game {
     }
 
     private static void randomTestFailedResult() {
-        tempHolder.append("Random test failed too many times: All money has been lost!\n");
+        tempHolder.append("Random test failed too many times:\n\tAll money has been lost!\n");
         player.reduceGainedReward(availableHeist.getReward());
     }
 
@@ -107,53 +107,45 @@ public class Game {
             case ACCURACY:
                 tempHolder.append("ACCURACY test failed: Friendly fire.");
                 randomCrewDead(1, 100);
-                tempHolder.append("Rewards reduced by 20%.\n");
+                tempHolder.append("\tRewards reduced by 20%.\n");
                 player.reduceGainedReward((availableHeist.getReward() / 100) * 20);
                 break;
             case FIREARM_HANDLING:
                 player.reduceGainedReward((availableHeist.getReward() / 100) * 10);
                 tempHolder.append("FIREARM HANDLING test failed: You got into a firefight with not enough firepower.\n");
                 randomCrewDead(2, 50);
-                tempHolder.append("Rewards reduced by 10%.\n");
+                tempHolder.append("\tRewards reduced by 10%.\n");
                 break;
             case REFLEX:
-                if (attemptRandomTest(Skill.SPEED)) {
-                    tempHolder.append("REFLEX test failed: random speed test -> Passed.\n");
-                } else {
-                    tempHolder.append("REFLEX test failed: random speed test -> Failed.\n");
+                tempHolder.append("REFLEX test failed: random speed test.\n");
+                if (!attemptRandomTest(Skill.SPEED)) {
                     randomCrewDead(1, 100);
                     player.reduceGainedReward((availableHeist.getReward() / 100) * 70);
-                    tempHolder.append("Rewards reduced by 70%.\n");
+                    tempHolder.append("\tRewards reduced by 70%.\n");
                 }
                 break;
             case STRATEGY:
-                if (attemptRandomTest(Skill.STRATEGY)) {
-                    tempHolder.append("STRATEGY test failed: another random strategy test -> Passed.\n");
-                } else {
-                    tempHolder.append("STRATEGY test failed: another random strategy test -> Failed.\n");
-                }
+                tempHolder.append("STRATEGY test failed: another random strategy test -> Passed.\n");
+                attemptRandomTest(Skill.STRATEGY);
                 player.reduceGainedReward((availableHeist.getReward() / 100) * 25);
-                tempHolder.append("Rewards reduced by 25%.\n");
+                tempHolder.append("\tRewards reduced by 25%.\n");
                 break;
             case CHARISMA:
-                if (attemptRandomTest(Skill.STRATEGY)) {
-                    tempHolder.append("CHARISMA test failed: another random strategy test -> Passed.\n");
-                } else {
-                    tempHolder.append("CHARISMA test failed: another random strategy test -> Failed.\n");
-                }
+                tempHolder.append("CHARISMA test failed: another random strategy test.\n");
+                attemptRandomTest(Skill.STRATEGY);
                 player.reduceGainedReward((availableHeist.getReward() / 100) * 15);
-                tempHolder.append("Rewards reduced by 15%.\n");
+                tempHolder.append("\tRewards reduced by 15%.\n");
                 break;
             case COMPUTER_SKILLS:
-                tempHolder.append("COMPUTER SKILLS test failed -> All money has been lost\n");
+                tempHolder.append("COMPUTER SKILLS test failed:\n\tAll money has been lost\n");
                 player.reduceGainedReward(availableHeist.getReward());
                 break;
             case SPEED:
-                tempHolder.append("SPEED test failed -> Rewards reduced by 30%\n");
+                tempHolder.append("SPEED test failed:\n\tRewards reduced by 30%\n");
                 player.reduceGainedReward((availableHeist.getReward() / 100) * 30);
                 break;
             case STEALTH:
-                tempHolder.append("STEALTH test failed -> Rewards reduced by 40%\n");
+                tempHolder.append("STEALTH test failed:\n\tRewards reduced by 40%\n");
                 player.reduceGainedReward((availableHeist.getReward() / 100) * 40);
                 break;
         }
@@ -251,7 +243,7 @@ public class Game {
                     player.reduceMoney(5);
                 }
                 break;
-            case "DONE":
+            case "READY":
                 if (confirm()) gameState = GameState.HEIST;
                 break;
             case "0":
@@ -461,7 +453,7 @@ public class Game {
                 .append("-- Enter [A-J] to remove a crew member from your team!\n")
                 .append("-- Enter [REPLACE] to replace 5 characters in the pool for 5% of your money!\n")
                 .append(player.getMoney().isEmpty() ? "Yes it's free if you have no money... Good Luck!" : "")
-                .append("\n-- Type [DONE] to start the Heist!\n")
+                .append("\n-- Type [READY] to start the Heist!\n")
                 .append("Enter command here:")
         ;
         return BUILDER.toString();
