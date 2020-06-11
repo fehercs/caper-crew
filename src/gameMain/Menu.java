@@ -168,6 +168,7 @@ public class Menu {
             if (money >= Game.player.getMONEY_GOAL()) {
                 clearConsole();
                 System.out.println("Congratulations! You WON!");
+                renderMoney();
             }
         }
         if (Game.player.getHeistsLeft() <= 0) {
