@@ -176,17 +176,6 @@ public class Menu {
             System.out.println("Game Over!");
         }
     }
-
-
-
-    private static void promptEnterKey(){
-        System.out.println("\t\t\t\t\tPress ENTER to continue!");
-        try {
-            int read = System.in.read(new byte[2]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
 
 

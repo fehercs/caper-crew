@@ -2,19 +2,20 @@ package gameMain;
 
 import crew.Skill;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Heist {
     private LinkedList<Test> tests;
     private int reward;
     private ArrayList<Test> failedTests;
-    private ArrayList<Container> succesfullTests;
+    private HashSet<Container> succesfullTests;
 
     public Heist() {
         generateTests();
         this.reward = generateSkillBasedReward();
         this.failedTests = new ArrayList<>();
-        this.succesfullTests = new ArrayList<>();
+        this.succesfullTests = new HashSet<>();
     }
 
     private void generateTests() {
@@ -47,15 +48,7 @@ public class Heist {
         return reward;
     }
 
-    public void setReward(int reward) {
-        this.reward = reward;
-    }
-
-    public ArrayList<Test> getFailedTests() {
-        return failedTests;
-    }
-
-    public ArrayList<Container> getSuccesfullTests() {
+    public HashSet<Container> getSuccesfullTests() {
         return succesfullTests;
     }
 
@@ -69,10 +62,6 @@ public class Heist {
 
     public boolean hasHeistFailed() {
         return succesfullTests.size() == 0;
-    }
-
-    public void addFailedTests(ArrayList<Test> failedTests) {
-        this.failedTests = failedTests;
     }
 
     @Override

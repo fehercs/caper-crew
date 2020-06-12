@@ -50,14 +50,6 @@ public class Player {
         return currentCut;
     }
 
-    public void setCurrentCut(int currentCut) {
-        this.currentCut = currentCut;
-    }
-
-    public ArrayList<CrewMember> getDeadCrew() {
-        return deadCrew;
-    }
-
     public void addDeadCrew(CrewMember dead) {
         CharacterPool.uniqueNameHolder.remove(dead.getName());
         this.deadCrew.add(dead);
@@ -86,14 +78,6 @@ public class Player {
     public void addCrewMember(CrewMember crew) {
         this.currentCut -= crew.getCutPercent();
         this.currentCrew.add(crew);
-    }
-
-    public void addCurrentCrew(List<CrewMember> selectedCrew) {
-        this.currentCrew = selectedCrew;
-    }
-
-    public void addCut(int cut) {
-        this.money += cut;
     }
 
     public void reduceMoney(int percent) {
