@@ -311,15 +311,36 @@ public class Game {
 
     private static void addCharacter(int index) {
         if (characterPool.getCharacterPool().size() > index) {
-            if (player.getCurrentCut() - characterPool.getCharacterPool().get(index).getCutPercent() > 0) {
-                player.addCrewMember(characterPool.getCharacterPool().get(index));
-                characterPool.removeCharacter(index);
+            var character =characterPool.getCharacterPool().get(index);
+            if (player.getCurrentCut() - character.getCutPercent() > 0) {
+                if (character.getRoleLimit() > nCharacter(character)) {
+                    player.addCrewMember(character);
+                    characterPool.removeCharacter(index);
+                } else {
+                    clearConsole();
+                    BUILDER.setLength(0);
+                    BUILDER
+                            .append("CANNOT ADD CREW MEMBER -- character role ")
+                            .append(character.getRole().toUpperCase())
+                            .append(" has a limit of ")
+                            .append(character.getRoleLimit())
+                            .append("!\n")
+                            ;
+                    System.out.println(BUILDER.toString());
+                    promptEnterKey();
+                }
             } else {
                 clearConsole();
                 System.out.println("CANNOT ADD CREW MEMBER -- your cut cannot be at or bellow 0!");
                 promptEnterKey();
             }
         }
+    }
+
+    private static int nCharacter(CrewMember character) {
+        return (int) player.getCurrentCrew().stream()
+                .filter(crewMember -> character.getRole().equals(crewMember.getRole()))
+                .count();
     }
 
     private static void removeCharacter(int index) {
