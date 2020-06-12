@@ -331,7 +331,7 @@ public class Game {
                 }
             } else {
                 clearConsole();
-                System.out.println("CANNOT ADD CREW MEMBER -- your cut cannot be at or bellow 0!");
+                System.out.println("CANNOT ADD CREW MEMBER -- your cut cannot be at or bellow 0%!");
                 promptEnterKey();
             }
         }
